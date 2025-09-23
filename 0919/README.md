@@ -1,6 +1,6 @@
 ## 0919
 
-- Card.cpp 카드 구조체 만들기
+- Card.cpp 카드 구조체 만들기 (생성, 출력, 셔플)
   
   <img width="413" height="68" alt="image" src="https://github.com/user-attachments/assets/ad8d1d79-6f9f-47ea-8834-4699b9836e7a" />
 
