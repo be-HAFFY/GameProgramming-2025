@@ -14,3 +14,5 @@
 
 
 - Tetris.cpp 테트리스 게임 구현
+  
+  <img width="408" height="349" alt="image" src="https://github.com/user-attachments/assets/a2959eef-4420-4c82-9b66-2ea532fc27f0" />
