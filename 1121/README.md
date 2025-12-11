@@ -1,6 +1,6 @@
 # 1121
 
-유니티 개발 기초 이해 2
+Unity 개발 기초 이해 2
 
 <img width="1194" height="660" alt="image" src="https://github.com/user-attachments/assets/53be8186-31b6-45b7-8649-dbbe0d50179c" />
 
