@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>고래 게임</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- 1. 기본 및 애니메이션 설정 --- */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2); }
+        50% { transform: scale(1.03); box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4); }
+        100% { transform: scale(1); box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2); }
+    }
+
+    body { 
+        margin: 0; 
+        overflow: hidden; 
+        background: linear-gradient(170deg, #b0e0e6 0%, #dbefff 100%);
+        height: 100vh;
+        color: #333; 
+        font-family: 'Poppins', sans-serif; 
+    }
+     
+/* --- 2. 메인 메뉴 (인트로) --- */
+    #mainMenu {
+        position: absolute; width: 100%; height: 100%;
+        display: flex; flex-direction: column;
+        justify-content: center; align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        z-index: 200;
+        animation: fadeIn 0.5s ease-out;
+    }
+    #mainMenu h1 { 
+        font-size: 7vw; 
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 40px; 
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .menu-button {
+        font-size: 24px; padding: 15px 30px; border: none;
+        border-radius: 15px;
+        cursor: pointer;
+        background: #4A90E2;
+        color: white; 
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 20px; width: 220px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+    }
+    .menu-button:hover { 
+        transform: scale(1.05) translateY(-2px); 
+        box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
+    }
+    #startButton {
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+/* --- 3. 좌/우 사이드 패널 (메뉴) --- */
+    #leftPanel, #rightPanel {
+        position: absolute;
+        width: 190px;
+        top: 20px;
+        display: none; 
+        flex-direction: column;
+        gap: 20px; 
+        z-index: 10;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+
+/* 새로운 고래 패널 추가 */
+#whaleInfoPanel {
+    position: absolute; 
+    width: 260px; /* leftPanel(190px)보다 넓게 */
+    
+    left: 130px; 
+    top: 20px; /* leftPanel(190px)보다 위에 위치 */
+    
+    display: none; /* JS에서 게임 시작 시 표시 */
+    flex-direction: column;
+    align-items: center; /* 내부 요소를 가운데 정렬 */
+    gap: 10px; /* 요소들 간의 간격 */
+    z-index: 10;
+    animation: fadeIn 0.6s ease-out;
+
+    background: rgba(0, 86, 179, 0.45); /* 진한 파란색 계열 */
+    backdrop-filter: blur(8px);
+    padding: 10px 15px;
+    border-radius: 15px;
+    color: white; /* 텍스트 색상 흰색 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+#whaleInfoPanel img {
+    width: 85px; /* 이미지 크기 조절 */
+    height: auto;
+    border-radius: 50%; /* 이미지를 원형으로 */
+    border: 3px solid rgba(255, 255, 255, 0.5); /* 흰색 테두리 */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); /* 그림자 */
+    margin-bottom: 5px; /* 아래쪽 여백 */
+}
+
+#whaleInfoPanel h3 {
+    margin: 0;
+    font-size: 28px; /* 제목 크기 키우기 */
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* 텍스트 그림자 */
+    color: white; /* 흰색으로 고정 */
+}
+
+    #leftPanel {
+        position: absolute;
+        width: 190px;
+        top: 210px;
+        left: 180px;
+        display: none;
+        flex-direction: column;
+        gap: 20px;
+        z-index: 10;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    #rightPanel {
+        position: absolute;
+        width: 190px;
+        top: 80px;
+        right: 200px;
+        display: none;
+        flex-direction: column;
+        gap: 20px;
+        z-index: 10;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+
+
+/* --- 4. 패널 공통 스타일 (글래스모피즘) --- */
+    .panel-box {
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(8px);
+        padding: 15px 20px;
+        border-radius: 15px;
+        color: #1a3b5a;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .panel-box h3 {
+        margin: 0 0 10px 0;
+        color: #0056b3;
+        border-bottom: 1px solid rgba(0, 86, 179, 0.2);
+        padding-bottom: 8px;
+        font-weight: 600;
+    }
+
+    #howToPlay p { margin: 5px 0 0 0; font-size: 13px; line-height: 1.5; color: #333; }
+    #highScoreDisplay { font-size: 36px; text-align: center; color: #0056b3; font-weight: 700; margin: 10px 0; }
+    #nextBallDisplay { font-size: 20px; text-align: center; }
+    #nextBallCanvas { background: rgba(255,255,255,0.3); border-radius: 50%; margin-top: 10px; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+/* '레벨 가이드' (왼쪽 패널) */
+    .guide-item { display: flex; align-items: center; margin-bottom: 2px; }
+
+    .guide-ball { 
+        border-radius: 50%; 
+        border: 1px solid rgba(0,0,0,0.1); 
+        margin-right: 20px; 
+        box-shadow: inset 0 -1px 2px rgba(0,0,0,0.1);
+        background-size: cover;
+        background-position: center;
+    }
+    .guide-arrow { font-size: 12px; color: #777; margin: 0; text-align: center; }
+
+
+/* --- 5. 게임 UI 요소들 (점수, 캔버스) --- */
+    #score { 
+        position: absolute; top: 20px; left: 50%; 
+        transform: translateX(-50%);
+        font-size: 28px; 
+        z-index: 10; 
+        color: #fff; 
+        font-weight: 700;
+        background: rgba(74, 144, 226, 0.8);
+        padding: 8px 25px;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        animation: fadeIn 0.6s ease-out;
+
+        /*중앙에 있지만 안보임*/
+        display: flex; 
+        opacity: 0;    
+        visibility: hidden; 
+    }
+    #gameCanvas {
+        border: 2px solid #ffffff;
+        display: none; 
+        margin: 0 auto;
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+        /* [수정] 캔버스 배경은 JS에서 제어하므로 CSS 배경 제거 */
+    }
+    
+/* --- 6. 게임 오버 화면 --- */
+#gameOverScreen {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(26, 59, 90, 0.6);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 40px 60px;
+    border-radius: 20px;
+    
+/*중앙에 있지만 안보임*/
+    display: flex; 
+    opacity: 0;    
+    visibility: hidden; 
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    
+    flex-direction: column;
+    align-items: center; z-index: 100;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+    #gameOverScreen h1 { margin: 0 0 20px 0; font-size: 48px; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+    #restartButton {
+        font-size: 22px; padding: 12px 25px; border: none;
+        border-radius: 10px; cursor: pointer;
+        background: #4A90E2;
+        color: white; 
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    #restartButton:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4); }
+
+/* --- 7. '그만하기' 버튼 --- */
+    #quitButton {
+        font-size: 16px; padding: 10px; border: none;
+        border-radius: 10px; cursor: pointer;
+        background-color: #E74C3C;
+        color: white; font-weight: 600;
+        width: 100%; 
+        box-sizing: border-box; 
+        margin-top: 15px; 
+        transition: background-color 0.2s, transform 0.2s;
+        box-shadow: 0 2px 10px rgba(231, 76, 60, 0.3);
+    }
+    #quitButton:hover { background-color: #C0392B; transform: translateY(-1px); }
+
+/* ▼▼▼ [ 8. 반응형 처리 (이 코드 추가) ] ▼▼▼ */
+@media (max-width: 1260px) {
+    #leftPanel, #rightPanel, #whaleInfoPanel {
+        display: none !important; /* 화면이 1260px보다 좁아지면 패널 숨기기 */
+    }
+}
+
+
+#footerBar {
+    position: fixed; /* 화면에 고정 */
+    bottom: 0;       /* 화면 맨 아래에 붙이기 */
+    left: 0;
+    width: 100%;     /* 가로 폭 100% */
+    height: 60px;    /* 하단 바 높이 */
+    background-color: #7fb3c8; 
+    z-index: 5; 
+    box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
+
+    display: flex;             /* Flexbox 레이아웃 사용 */
+    justify-content: center;   /* 텍스트 가로 중앙 정렬 */
+    align-items: center;       /* 텍스트 세로 중앙 정렬 */
+    
+    color: rgba(255, 255, 255, 0.7); /* 텍스트 색상 (흰색, 살짝 투명) */
+    font-size: 14px;           /* 텍스트 크기 */
+    font-weight: 600;          /* 텍스트 굵기 */
+    letter-spacing: 0.5px;     /* 자간 */
+}
+
+</style>
+</head>
+<body>
+
+<div id="mainMenu">
+    <h1>고래 게임</h1>
+    <button id="startButton" class="menu-button">게임 시작</button>
+</div>
+<div id="whaleInfoPanel">
+    <h3>고래 게임</h3>
+    <!-- [중요] 이미지 경로는 실제 파일 위치에 맞게 수정하세요! -->
+    <img src="./image/Whale.png" alt="고래 이미지">
+</div>
+
+
+<div id="leftPanel">
+    <div id="levelGuide" class="panel-box">
+        <h3>레벨 가이드</h3>
+    </div>
+</div>
+
+<!-- ... (이하 생략) ... -->
+<div id="leftPanel">
+    <div id="levelGuide" class="panel-box">
+        <h3>레벨 가이드</h3>
+    </div>
+</div>
+
+<div id="rightPanel">
+    <div id="nextBallDisplay" class="panel-box">
+        <h3>다음</h3>
+        <canvas id="nextBallCanvas" width="50" height="50"></canvas>
+    </div>
+    <div id="highScorePanel" class="panel-box">
+        <h3>최고 점수</h3>
+        <p id="highScoreDisplay">0</p>
+    </div>
+    <button id="quitButton">그만하기</button>
+
+    <div id="howToPlay" class="panel-box" style="margin-top:10px;">
+        <h3>게임 방법</h3>
+        <p>1. 마우스로 위치를 정하고 클릭!</p>
+        <p>2. 같은 생물이 만나면 합체!</p>
+        <p>3. 수면을 넘으면 게임 오버!</p>
+    </div>
+</div>
+
+
+<div id="gameOverScreen">
+    <h1>Game Over</h1>
+    <button id="restartButton">다시 시작</button>
+</div>
+<div id="score">점수: 0</div>
+<canvas id="gameCanvas"></canvas>
+
+<div id="footerBar">
+    <span>© 2025 Whale Game. All Rights Reserved. &nbsp; </span>
+    
+    <a href="https://github.com/ssongchaewon/gamePJ1" target="_blank" rel="noopener noreferrer">
+GitHub Repository
+    </a>
+</div>
+<audio id="backgroundMusic" src="./sound/Teddy Bear Waltz.mp3" loop></audio><audio id="backgroundMusic" src="./sound/Teddy Bear Waltz.mp3" loop></audio>
+<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<script src="js/game.js"></script> 
+</body>
+</html>
